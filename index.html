@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>智能家庭系统Pro</title>
+  <style>
+    * { box-sizing: border-box; }
+   
+    :root {
+      --primary: #00897b;
+      --primary-light: #e0f2f1;
+      --primary-dark: #005b4f;
+      --accent: #ff6f00;
+      --text: #222;
+      --text-light: #666;
+      --danger: #f44336;
+      --success: #4caf50;
+      --warning: #ff9800;
+      --background: linear-gradient(135deg, #e0f7fa, #ffffff);
+      --card-bg: #ffffff;
+      --shadow: 0 2px 10px rgba(0,0,0,0.1);
+      --shadow-hover: 0 4px 15px rgba(0,0,0,0.15);
+      --transition: all 0.3s ease;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      background-color: var(--primary-light);
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      color: var(--primary);
+      font-size: 1.8em;
+      font-weight: bold;
+      gap: 10px;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 15px;
+    }
+
+    .nav-btn {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: var(--transition);
+    }
+
+    .nav-btn:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+
+    .main-container {
+      display: flex;
+      margin: 20px;
+      gap: 20px;
+      position: relative;
+    }
+
+    .left-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 70%;
+    }
+
+    .right-panel {
+      flex: 0 0 350px;
+      position: sticky;
+      top: 80px;
+      max-height: calc(100vh - 100px);
+      overflow-y: auto;
+    }
+
+    .section {
+      background: var(--card-bg);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+      margin-bottom: 20px;
+      transition: var(--transition);
+    }
+
+    .section:hover {
+      box-shadow: var(--shadow-hover);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--primary);
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--primary-light);
+    }
+
+    .section-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .current-room {
+      font-size: 1em;
+      color: var(--primary);
+      font-weight: bold;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .room-indicator {
+      width: 12px;
+      height: 12px;
+      background-color: var(--success);
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dashboard {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      align-items: flex-start;
+      width: 100%;
+    }
+
+    .card {
+      flex: 1 0 160px;
+      padding: 16px;
+      background: var(--card-bg);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+      min-width: 160px;
+      max-width: 200px;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: var(--primary);
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .value {
+      font-size: 1.6em;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .trend {
+      font-size: 0.8em;
+      color: var(--text-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .trend-up {
+      color: var(--danger);
+    }
+
+    .trend-down {
+      color: var(--success);
+    }
+
+    #videoGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 10px;
+      overflow: hidden;
+      border-radius: 12px;
+      margin-top: 20px;
+      aspect-ratio: 4/3;
+      max-height: 500px;
+    }
+
+    .camera-tile {
+      background: #f5f5f5;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+      position: relative;
+      transition: var(--transition);
+    }
+
+    .camera-tile img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #ccc;
+    }
+
+    .camera-tile.active {
+      border: 3px solid var(--primary);
+    }
+
+    .cam-label {
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 6px 12px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 0.9em;
+      border-bottom-right-radius: 8px;
+    }
+
+    .cam-controls {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      gap: 8px;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .camera-tile:hover .cam-controls {
+      opacity: 1;
+    }
+
+    .cam-btn {
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .cam-btn:hover {
+      background: rgba(0, 137, 123, 0.8);
+    }
+
+    .status-panel {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: space-between;
+    }
+
+    .status-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 0.9em;
+      text-align: center;
+      color: var(--text);
+      background: var(--card-bg);
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      transition: var(--transition);
+      flex: 1;
+      min-width: 80px;
+    }
+
+    .status-box:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .status-icon {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 4px;
+      transition: var(--transition);
+    }
+
+    .alert {
+      animation: blink 1s infinite alternate;
+      filter: drop-shadow(0 0 5px red);
+    }
+
+    @keyframes blink {
+      0% { filter: brightness(1) drop-shadow(0 0 5px red); }
+      100% { filter: brightness(1.5) drop-shadow(0 0 10px red); }
+    }
+
+    .people-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      width: 100%;
+    }
+
+    .people-card {
+      padding: 12px 16px;
+      background: var(--card-bg);
+      border-radius: 14px;
+      box-shadow: var(--shadow);
+      text-align: center;
+      transition: var(--transition);
+      flex: 1 0 150px;
+      max-width: 180px;
+      position: relative;
+    }
+
+    .people-card:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+    }
+
+    .people-card h4 {
+      margin: 0 0 10px;
+      color: var(--primary);
+    }
+
+    .people-card p {
+      margin: 0;
+      font-size: 1.2em;
+      color: var(--text);
+    }
+
+    .people-status {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background-color: var(--success);
+    }
+
+    .people-status.away {
+      background-color: var(--text-light);
+    }
+
+    .tab-container {
+      margin-bottom: 20px;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--primary-light);
+      margin-bottom: 15px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      position: relative;
+      color: var(--text-light);
+      transition: var(--transition);
+    }
+
+    .tab.active {
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    .tab.active::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background-color: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .chart-container {
+      height: 250px;
+      width: 100%;
+      position: relative;
+      margin-top: 10px;
+      background: rgba(0, 137, 123, 0.05);
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .chart {
+      width: 100%;
+      height: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+
+    thead {
+      background-color: var(--primary-light);
+      color: var(--primary);
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      font-weight: bold;
+    }
+
+    tr:nth-child(even) {
+      background-color: rgba(0, 137, 123, 0.05);
+    }
+
+    tr:hover {
+      background-color: rgba(0, 137, 123, 0.1);
+    }
+
+    .timeline {
+      position: relative;
+      margin: 20px 0;
+      padding-left: 30px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: var(--primary-light);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 20px;
+      padding-bottom: 20px;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -25px;
+      top: 0;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--primary);
+    }
+
+    .timeline-time {
+      color: var(--text-light);
+      font-size: 0.8em;
+      margin-bottom: 5px;
+    }
+
+    .timeline-content {
+      background: var(--card-bg);
+      padding: 10px 15px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+    }
+
+    .alert-item {
+      padding: 10px;
+      border-radius: 8px;
+      background-color: rgba(255, 111, 0, 0.1);
+      border-left: 4px solid var(--warning);
+      margin-bottom: 10px;
+      transition: var(--transition);
+    }
+
+    .alert-item:hover {
+      transform: translateX(5px);
+    }
+
+    .alert-title {
+      font-weight: bold;
+      color: var(--warning);
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .alert-time {
+      font-size: 0.8em;
+      color: var(--text-light);
+    }
+
+    .alert-message {
+      margin-top: 5px;
+      color: var(--text);
+    }
+
+    .settings-option {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .settings-option:last-child {
+      border-bottom: none;
+    }
+
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 16px;
+      width: 16px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--primary);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background-color: var(--card-bg);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: var(--shadow-hover);
+      width: 80%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--primary-light);
+    }
+
+    .modal-title {
+      font-size: 1.5em;
+      color: var(--primary);
+      margin: 0;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      font-size: 1.5em;
+      cursor: pointer;
+      color: var(--text-light);
+    }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 200px;
+    }
+
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border-left-color: var(--primary);
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .notification-badge {
+      background-color: var(--danger);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8em;
+      position: absolute;
+      top: -5px;
+      right: -5px;
+    }
+
+    @media (max-width: 1200px) {
+      .main-container {
+        flex-direction: column;
+      }
+      
+      .left-panel {
+        max-width: 100%;
+      }
+      
+      .right-panel {
+        position: static;
+        width: 100%;
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .dashboard {
+        justify-content: center;
+      }
+      
+      .card {
+        flex: 0 0 45%;
+      }
+      
+      .people-card {
+        flex: 0 0 45%;
+      }
+      
+      .status-panel {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        flex: 0 0 100%;
+      }
+      
+      .people-card {
+        flex: 0 0 100%;
+      }
+      
+      .nav-buttons {
+        display: none;
+      }
+      
+      .logo {
+        font-size: 1.4em;
+      }
+    }
+  .floating-advice-box {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 350px;
+  max-height: 400px;
+  background-color: var(--card-bg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  z-index: 9999;
+  overflow: hidden;
+  display: none;
+  flex-direction: column;
+  font-family: Arial, sans-serif;
+}
+
+.drag-header {
+  background-color: var(--primary-light);
+  padding: 10px 15px;
+  cursor: move;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  color: var(--primary);
+  border-bottom: 1px solid var(--primary);
+}
+
+.advice-content {
+  padding: 15px;
+  overflow-y: auto;
+  max-height: 300px;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  cursor: pointer;
+  color: var(--text-light);
+}
+
+ 
+  </style>
+    <script src="/script.js"></script>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <span>🏠</span>
+      <span>智能家庭系统Pro</span>
+    </div>
+    <div class="nav-buttons">
+      <button class="nav-btn" onclick="openModal('settingsModal')">⚙️ 设置</button>
+      <button class="nav-btn" onclick="openModal('alertsModal')">🔔 通知</button>
+    </div>
+  </header>
+
+  <div class="main-container">
+    <div class="left-panel">
+      <!-- Current Room Section -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">实时监控</div>
+          <div class="current-room" id="currentRoom">
+            <span class="room-indicator"></span>
+            <span id="roomName">加载中...</span>
+          </div>
+        </div>
+
+        <!-- Video Grid -->
+        <div id="videoGrid">
+          <div class="camera-tile" id="bedroomTile">
+            <div class="cam-label">卧室</div>
+            <img src="/video_feed/bedroom" onerror="this.onerror=null;this.src=''; this.alt='摄像头离线'" />
+            <div class="cam-controls">
+              <button class="cam-btn" title="全屏查看" onclick="openFullscreenCamera('bedroom')">⛶</button>
+              <button class="cam-btn" title="查看历史记录" onclick="openCameraHistory('bedroom')">🕒</button>
+            </div>
+          </div>
+          <div class="camera-tile" id="livingroomTile">
+            <div class="cam-label">客厅</div>
+            <img src="/video_feed/livingroom" onerror="this.onerror=null;this.src=''; this.alt='摄像头离线'" />
+            <div class="cam-controls">
+              <button class="cam-btn" title="全屏查看" onclick="openFullscreenCamera('livingroom')">⛶</button>
+              <button class="cam-btn" title="查看历史记录" onclick="openCameraHistory('livingroom')">🕒</button>
+            </div>
+          </div>
+          <div class="camera-tile" id="hallwayTile">
+            <div class="cam-label">走廊</div>
+            <img src="/video_feed/hallway" onerror="this.onerror=null;this.src=''; this.alt='摄像头离线'" />
+            <div class="cam-controls">
+              <button class="cam-btn" title="全屏查看" onclick="openFullscreenCamera('hallway')">⛶</button>
+              <button class="cam-btn" title="查看历史记录" onclick="openCameraHistory('hallway')">🕒</button>
+            </div>
+          </div>
+          <div class="camera-tile" id="balconyTile">
+            <div class="cam-label">阳台</div>
+            <img src="/video_feed/balcony" onerror="this.onerror=null;this.src=''; this.alt='摄像头离线'" />
+            <div class="cam-controls">
+              <button class="cam-btn" title="全屏查看" onclick="openFullscreenCamera('balcony')">⛶</button>
+              <button class="cam-btn" title="查看历史记录" onclick="openCameraHistory('balcony')">🕒</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Environment Data Section -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">环境数据</div>
+          <div>
+            <button class="nav-btn" onclick="openModal('historyModal')">查看历史数据</button>
+          </div>
+        </div>
+
+        <!-- Dashboard with Cards -->
+        <div class="dashboard">
+          <div class="card">
+            <h3>🌡️ 温度</h3>
+            <div class="value" id="Temperature">--</div>
+            <div class="trend" id="temperatureTrend">--</div>
+          </div>
+          <div class="card">
+            <h3>💧 湿度</h3>
+            <div class="value" id="Humidity">--</div>
+            <div class="trend" id="humidityTrend">--</div>
+          </div>
+          <div class="card">
+            <h3>☀️ 光照 (lux)</h3>
+            <div class="value" id="lux">--</div>
+            <div class="trend" id="luxTrend">--</div>
+          </div>
+          <div class="card">
+            <h3>🌫️ CO₂</h3>
+            <div class="value" id="co2">--</div>
+            <div class="trend" id="co2Trend">--</div>
+          </div>
+        </div>
+
+        <!-- Status Panel -->
+        <div class="status-panel">
+          <div class="status-box">
+            <img id="smokeIcon" class="status-icon" 
+                 src="https://cdn-icons-png.flaticon.com/512/565/565340.png" 
+                 alt="烟雾状态" 
+                 onerror="this.style.display='none'; this.nextElementSibling.innerText='烟雾：图标加载失败';"/>
+            <span id="smokeLabel">烟雾：正常</span>
+          </div>
+
+          <div class="status-box">
+            <img id="lightIcon" class="status-icon" 
+                 src="https://cdn-icons-png.flaticon.com/512/702/702797.png" 
+                 alt="灯光状态"
+                 onerror="this.style.display='none'; this.nextElementSibling.innerText='灯光：图标加载失败';"/>
+            <span id="lightLabel">灯光亮度</span>
+          </div>
+
+          <div class="status-box">
+            <img class="status-icon" 
+                 src="https://cdn-icons-png.flaticon.com/512/1146/1146869.png" 
+                 alt="空调图标"
+                 onerror="this.style.display='none'; this.nextElementSibling.innerText='空调图标加载失败';"/>
+            <span id="acLabel">空调</span>
+          </div>
+
+          <div class="status-box">
+            <img class="status-icon" 
+                 src="https://cdn-icons-png.flaticon.com/512/3022/3022251.png" 
+                 alt="门窗图标"
+                 onerror="this.style.display='none'; this.nextElementSibling.innerText='门窗图标加载失败';"/>
+            <span id="doorLabel">门窗：已锁</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Home Residents Section -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">家庭成员</div>
+          <div>
+            <button class="nav-btn" onclick="openModal('activityModal')">活动记录</button>
+          </div>
+        </div>
+
+        <!-- People Names Section -->
+        <div class="people-container" id="peopleContainer">
+          <!-- People cards will be dynamically populated here -->
+          <div class="loading">
+            <div class="spinner"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-panel">
+      <!-- Recent Alerts Section -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">最近警报</div>
+          <div>
+            <button class="nav-btn" onclick="openModal('alertsModal')">查看全部</button>
+          </div>
+        </div>
+
+        <div id="recentAlerts">
+          <!-- Alert items will be populated here -->
+          <div class="alert-item">
+            <div class="alert-title">
+              <span>⚠️</span>
+              <span>烟雾检测警报</span>
+            </div>
+            <div class="alert-time">今天 14:30</div>
+            <div class="alert-message">阳台检测到烟雾浓度异常，请检查</div>
+          </div>
+          <div class="alert-item">
+            <div class="alert-title">
+              <span>ℹ️</span>
+              <span>温度异常</span>
+            </div>
+            <div class="alert-time">今天 12:15</div>
+            <div class="alert-message">卧室温度超过28°C，建议开启空调</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Activity Section -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title">最近活动</div>
+        </div>
+
+        <div class="timeline" id="recentActivity">
+          <!-- Timeline items will be populated here -->
+          <div class="timeline-item">
+            <div class="timeline-time">15:45</div>
+            <div class="timeline-content">
+              <strong>张三</strong> 进入了(实例) <strong>客厅</strong>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">15:30</div>
+            <div class="timeline-content">
+              <strong>李四</strong> 离开了（实例） <strong>家</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <!-- History Data Modal -->
+  <div id="historyModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">历史数据</h2>
+        <button class="close-btn" onclick="closeModal('historyModal')">&times;</button>
+      </div>
+      <div class="tab-container" id="historyTab">
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('historyTab', 'temperatureTab')">温度</div>
+          <div class="tab" onclick="switchTab('historyTab', 'humidityTab')">湿度</div>
+          <div class="tab" onclick="switchTab('historyTab', 'luxTab')">光照</div>
+          <div class="tab" onclick="switchTab('historyTab', 'co2Tab')">CO₂</div>
+        </div>
+        <div class="tab-content active" id="temperatureTab">
+          <div class="chart-container">
+            <canvas id="temperatureChart" class="chart"></canvas>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>温度</th>
+                <th>房间</th>
+              </tr>
+            </thead>
+            <tbody id="temperatureTableBody">
+              <!-- Will be populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-content" id="humidityTab">
+          <div class="chart-container">
+            <canvas id="humidityChart" class="chart"></canvas>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>湿度</th>
+                <th>房间</th>
+              </tr>
+            </thead>
+            <tbody id="humidityTableBody">
+              <!-- Will be populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-content" id="luxTab">
+          <div class="chart-container">
+            <canvas id="luxChart" class="chart"></canvas>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>光照(lux)</th>
+                <th>房间</th>
+              </tr>
+            </thead>
+            <tbody id="luxTableBody">
+              <!-- Will be populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-content" id="co2Tab">
+          <div class="chart-container">
+            <canvas id="co2Chart" class="chart"></canvas>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>CO₂</th>
+                <th>房间</th>
+              </tr>
+            </thead>
+            <tbody id="co2TableBody">
+              <!-- Will be populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Modal -->
+  <div id="activityModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">人员活动记录</h2>
+        <button class="close-btn" onclick="closeModal('activityModal')">&times;</button>
+      </div>
+      <div class="tab-container" id="activityTab">
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('activityTab', 'allActivityTab')">全部活动</div>
+          <div class="tab" onclick="switchTab('activityTab', 'entranceTab')">出入记录</div>
+          <div class="tab" onclick="switchTab('activityTab', 'roomActivityTab')">房间活动</div>
+        </div>
+        <div class="tab-content active" id="allActivityTab">
+          <div class="timeline" id="allActivityTimeline">
+            <!-- Will be populated dynamically -->
+          </div>
+        </div>
+        <div class="tab-content" id="entranceTab">
+          <div class="chart-container">
+            <canvas id="entranceChart" class="chart"></canvas>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>人员</th>
+                <th>动作</th>
+              </tr>
+            </thead>
+            <tbody id="entranceTableBody">
+              <!-- Will be populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-content" id="roomActivityTab">
+          <div class="chart-container">
+            <canvas id="roomActivityChart" class="chart"></canvas>
+          </div>
+          <div class="timeline" id="roomActivityTimeline">
+            <!-- Will be populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<!-- deepseak ai建议助手，建议悬浮窗显示 -->
+<div id="adviceBox" class="floating-advice-box">
+  <div class="drag-header">
+    <span>🧠 DeepSpeak AI 建议助手</span>
+    <button class="close-btn" onclick="document.getElementById('adviceBox').style.display='none'">✖</button>
+  </div>
+  <div id="adviceContent" class="advice-content"></div>
+</div>
+
+  <!-- Alerts Modal -->
+  <div id="alertsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">系统警报</h2>
+        <button class="close-btn" onclick="closeModal('alertsModal')">&times;</button>
+      </div>
+      <div class="tab-container" id="alertsTab">
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('alertsTab', 'allAlertsTab')">全部警报</div>
+          <div class="tab" onclick="switchTab('alertsTab', 'securityAlertsTab')">安全警报</div>
+          <div class="tab" onclick="switchTab('alertsTab', 'environmentAlertsTab')">环境警报</div>
+        </div>
+        <div class="tab-content active" id="allAlertsTab">
+          <div id="alertsList">
+            <!-- Will be populated dynamically -->
+          </div>
+        </div>
+        <div class="tab-content" id="securityAlertsTab">
+          <div id="securityAlertsList">
+            <!-- Will be populated dynamically -->
+          </div>
+        </div>
+        <div class="tab-content" id="environmentAlertsTab">
+          <div id="environmentAlertsList">
+            <!-- Will be populated dynamically -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">系统设置</h2>
+        <button class="close-btn" onclick="closeModal('settingsModal')">&times;</button>
+      </div>
+      <div class="tab-container" id="settingsTab">
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('settingsTab', 'generalSettingsTab')">通用设置</div>
+          <div class="tab" onclick="switchTab('settingsTab', 'notificationSettingsTab')">通知设置</div>
+          <div class="tab" onclick="switchTab('settingsTab', 'securitySettingsTab')">安全设置</div>
+        </div>
+        <div class="tab-content active" id="generalSettingsTab">
+          <div class="settings-option">
+            <span>暗黑模式</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-option">
+            <span>数据自动刷新</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="autoRefreshToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-option">
+            <span>刷新间隔 (秒)</span>
+            <input type="number" id="refreshInterval" min="1" max="60" value="3" style="width: 60px">
+          </div>
+        </div>
+        <div class="tab-content" id="notificationSettingsTab">
+          <div class="settings-option">
+            <span>启用烟雾报警</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="smokeAlertToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-option">
+            <span>启用温度异常提示</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="tempAlertToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-option">
+            <span>启用人员出入通知</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="personAlertToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="tab-content" id="securitySettingsTab">
+          <div class="settings-option">
+            <span>启用摄像头动态检测</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="motionDetectionToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-option">
+            <span>启用门窗传感器</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="doorSensorToggle" checked>
+              <span class="slider"></span>
+            </label>
+          </div>
+          <div class="settings-option">
+            <span>异常活动自动锁定</span>
+            <label class="toggle-switch">
+              <input type="checkbox" id="autoLockToggle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">历史数据</h2>
+        <button class="close-btn" onclick="closeModal('historyModal')">&times;</button>
+      </div>
+      <div class="tab-container">
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab('historyTab', 'temperatureTab')">温度</div>
+          <div class="tab" onclick="switchTab('historyTab', 'humidityTab')">湿度</div>
+          <div class="tab" onclick="switchTab('historyTab', 'luxTab')">光照</div>
+          <div class="tab" onclick="switchTab('historyTab', 'co2Tab')">CO₂</div>
+        </div>
+        <div class="tab-content active" id="temperatureTab">
+          <div class="chart-container">
+            <canvas id="temperatureChart" class="chart"></canvas>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>温度</th>
+                <th>房间</th>
+              </tr>
+            </thead>
+            <tbody id="temperatureTableBody">
+              <tr>
+                <td>2025-05-06 15:30</td>
+                <td>24°C</td>
+                <td>客厅</td>
+              </tr>
+              <tr>
+                <td>2025-05-06 15:00</td>
+                <td>23.5°C</td>
+                <td>客厅</td>
+              </tr>
+              <tr>
+                <td>2025-05-06 14:30</td>
+                <td>23°C</td>
+                <td>客厅</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-content" id="humidityTab">
+          <div class="chart-container">
+            <canvas id="humidityChart" class="chart"></canvas>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>湿度</th>
+                <th>房间</th>
+              </tr>
+            </thead>
+            <tbody id="humidityTableBody">
+              <tr>
+                <td>2025-05-06 15:30</td>
+                <td>45%</td>
+                <td>客厅</td>
+              </tr>
+              <tr>
+                <td>2025-05-06 15:00</td>
+                <td>46%</td>
+                <td>客厅</td>
+              </tr>
+              <tr>
+                <td>2025-05-06 14:30</td>
+                <td>48%</td>
+                <td>客厅</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-content" id="luxTab">
+          <div class="chart-container">
+            <canvas id="luxChart" class="chart"></canvas>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>光照(lux)</th>
+                <th>房间</th>
+              </tr>
+            </thead>
+            <tbody id="luxTableBody">
+              <tr>
+                <td>2025-05-06 15:30</td>
+                <td>320</td>
+                <td>客厅</td>
+              </tr>
+              <tr>
+                <td>2025-05-06 15:00</td>
+                <td>310</td>
+                <td>客厅</td>
+              </tr>
+              <tr>
+                <td>2025-05-06 14:30</td>
+                <td>290</td>
+                <td>客厅</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="tab-content" id="co2Tab">
+          <div class="chart-container">
+            <canvas id="co2Chart" class="chart"></canvas>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>时间</th>
+                <th>CO₂</th>
+                <th>房间</th>
+              </tr>
+            </thead>
+            <tbody id="co2TableBody">
+              <tr>
+                <td>2025-05-06 15:30</td>
+                <td>650</td>
+                <td>客厅</td>
+              </tr>
+              <tr>
+                <td>2025-05-06 15:00</td>
+                <td>640</td>
+                <td>客厅</td>
+              </tr>
+              <tr>
+                <td>2025-05-06 14:30</td>
+                <td>620</td>
+                <td>客厅</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
